@@ -1,0 +1,29 @@
+
+    model{
+      
+      # PRIORS 
+      # year effect
+       for(i in 1:num_years){
+	 int_year[i] ~ dnorm(0, 0.0001) 
+       }
+      
+      # slope on height
+      b_height ~ dnorm(0, 0.0001)
+      
+      # random intercept for each gap
+      for(g in 1:num_gaps){
+	gap_int[g] ~ dnorm(0, tua_gap)
+      }
+      tua_gap ~ dgamma(0.001, 0.001)
+      sigma_gap = 1 / tua_gap
+      
+      for(n in 1:num_obs){
+      
+	sur[n] ~ dbern(p[n])
+	p[n] <- max(0.000001, min(0.99999999, p_raw[n]))
+	p_raw[n] <- 1 / (1 + exp(-z_lp[n]))	
+	z_lp[n] <- int_year[year[n]] + b_height * height[n] + gap_int[gapID[n]] 
+      
+      }
+
+    }

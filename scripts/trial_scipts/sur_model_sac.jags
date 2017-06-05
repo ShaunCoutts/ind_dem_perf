@@ -1,0 +1,56 @@
+
+    model{
+      
+      # PRIORS 
+      # year effect
+      for(i in 1:num_years){
+	int_year[i] ~ dnorm(0, 0.0001) 
+      }
+       
+      # slopes
+      b_sac ~ dnorm(0, 0.0001)
+      b_height ~ dnorm(0, 0.0001)
+      
+      # random intercept for each gap
+#       for(g in 1:num_gaps){
+# 	gap_int[g] ~ dnorm(0, tua_gap)
+#       }
+#       tua_gap ~ dgamma(0.001, 0.001)
+#       sigma_gap = 1 / tua_gap
+      
+      # fit the non-spatial model to get the residuals 
+      for(n in 1:num_obs){
+      
+	r_ns[n] = sur1[n] - p_ns[n] 
+	p_ns[n] = 1 / (1 + exp(-z_lp_ns[n]))
+	z_lp_ns[n] = int_year[year[n]] + b_height * height[n]# + gap_int[gapID[n]]  
+      
+      }
+      
+      # DISTANCE EFFECTS
+      # fit a model to the residuals
+      dd_sac ~ dunif(0.0001, 5)
+
+      # spatial predictor term 
+      for(n in 1:num_obs){
+	for(j in 1:num_neigh[n]){
+	
+	  w[n, j] = exp(-dd_sac * dist_neigh[n, j])
+	  sac_raw[n, j] = r_ns[inds_neigh[n, j]] * w[n, j]
+	
+	}
+	
+	sac[n] = sum(sac_raw[n, 1:num_neigh[n]]) / sum(w[n, 1:num_neigh[n]]) 
+      }
+      
+      #LIKLIEHOOD
+      for(n in 1:num_obs){
+      
+	sur2[n] ~ dbern(p[n])
+	p[n] = max(0.000001, min(0.99999999, p_raw[n]))
+	p_raw[n] = 1 / (1 + exp(-z_lp[n]))
+	z_lp[n] = z_lp_ns[n] + b_sac * sac[n] 
+      
+      }
+
+    }

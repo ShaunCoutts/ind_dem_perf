@@ -1,0 +1,17 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Viana \emph{et~al.}(2013)Viana, Jackson, Graham \&
+  Parnell}]{Vian2013}
+Viana, M., Jackson, A.L., Graham, N. \& Parnell, A.C. (2013) Disentangling
+  spatio-temporal processes in a hierarchical system: a case study in fisheries
+  discards. \emph{Ecography}, \textbf{36}(5), 569--578.
+
+\end{thebibliography}

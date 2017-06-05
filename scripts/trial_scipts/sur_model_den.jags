@@ -1,0 +1,40 @@
+
+    model{
+      
+      # PRIORS 
+      # year effect
+       for(i in 1:num_years){
+	 int_year[i] ~ dnorm(0, 0.0001) 
+       }
+      
+      # slopes
+      b_height ~ dnorm(0, 0.0001)
+      b_den ~ dnorm(0, 0.0001)
+      
+      # DISTANCE EFFECTS
+      dd_den ~ dunif(0.0000001, 5)
+      
+      # find the summed exp(-dd_den * dist) * height
+      # var dist_weight[num_obs, max_num_cont]
+      for(n in 1:num_obs){
+	for(col in 1:num_cont[n]){
+	
+	  dist_weight[n, col] <- exp(-dd_den * dists[n, col])
+	
+	}
+      
+	dist_height[n] <- sum(dist_weight[n, 1:num_cont[n]] * height_mat[n, 1:num_cont[n]])  
+      
+      }
+      
+      #LIKLIEHOOD
+      for(n in 1:num_obs){
+      
+	sur[n] ~ dbern(p[n])
+	p[n] <- max(0.000001, min(0.99999999, p_raw[n]))
+	p_raw[n] <- 1 / (1 + exp(-z_lp[n]))
+	z_lp[n] <- int_year[year[n]] + b_height * height[n] + b_den * dist_height[n] 
+      
+      }
+
+    }

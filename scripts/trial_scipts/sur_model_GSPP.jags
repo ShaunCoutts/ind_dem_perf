@@ -1,0 +1,59 @@
+
+    model{
+      
+      # PRIORS 
+      # year effect
+      for(i in 1:num_years){
+	int_year[i] ~ dnorm(0, 0.0001) 
+      }
+      
+      # slopes
+      b_height ~ dnorm(0, 0.0001)
+       
+      # DISTANCE EFFECTS
+      dd_spp ~ dunif(0.00001, 5)
+      sigma_spp = 1 / sigma_spp_inv
+      sigma_spp_inv ~ dgamma(0.001, 0.001)
+
+
+      # spatial predictive proccess 
+      spp ~ dmnorm(mu_spp, C_spp_inv)
+      C_spp_inv = inverse(C_spp)
+      for(k in 1:num_knots){
+ 	
+ 	mu_spp[k] = 0
+ 	C_spp[k, k] = sigma_spp
+ 	  
+ 	for(j in 1:(k - 1)){
+ 	  
+ 	  C_spp[k, j] = sigma_spp * exp(-(dd_spp * s_knot_dists[k, j])) 
+ 	  C_spp[j, k] = C_spp[k, j]
+ 	  
+ 	}
+      }
+      # Interpolate back from the knot points to the observed data 
+      for(n in 1:num_obs){
+	for(k in 1:num_knots){
+	  C_spp_s[n, k] = sigma_spp * exp(-(dd_spp * s_knot_ob_dist[n, k]))
+	}
+      }
+      spp_interp = C_spp_s %*% C_spp_inv %*% spp
+ 
+#       # random intercept for each gap
+#       for(g in 1:num_gaps){
+# 	gap_int[g] ~ dnorm(0, tua_gap)
+#       }
+#       tua_gap ~ dgamma(0.001, 0.001)
+#       sigma_gap = 1 / tua_gap
+      
+      #LIKLIEHOOD
+      for(n in 1:num_obs){
+      
+	sur[n] ~ dbern(p[n])
+	p[n] <- max(0.000001, min(0.99999999, p_raw[n]))
+	p_raw[n] <- 1 / (1 + exp(-z_lp[n]))
+	z_lp[n] <- int_year[year[n]] + b_height * height[n] + spp_interp[n] #gap_int[gapID[n]]   
+      
+      }
+
+    }

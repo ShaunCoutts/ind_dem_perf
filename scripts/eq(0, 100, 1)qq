@@ -1,0 +1,66 @@
+expand.grid                package:base                R Documentation
+
+_C_r_e_a_t_e _a _D_a_t_a _F_r_a_m_e _f_r_o_m _A_l_l _C_o_m_b_i_n_a_t_i_o_n_s _o_f _F_a_c_t_o_r _V_a_r_i_a_b_l_e_s
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Create a data frame from all combinations of the supplied vectors
+     or factors.  See the description of the return value for precise
+     details of the way this is done.
+
+_U_s_a_g_e:
+
+     expand.grid(..., KEEP.OUT.ATTRS = TRUE, stringsAsFactors = TRUE)
+     
+_A_r_g_u_m_e_n_t_s:
+
+     ...: vectors, factors or a list containing these.
+
+KEEP.OUT.ATTRS: a logical indicating the ‘"out.attrs"’ attribute (see
+          below) should be computed and returned.
+
+stringsAsFactors: logical specifying if character vectors are converted
+          to factors.
+
+_V_a_l_u_e:
+
+     A data frame containing one row for each combination of the
+     supplied factors.  The first factors vary fastest.  The columns
+     are labelled by the factors if these are supplied as named
+     arguments or named components of a list.  The row names are
+     ‘automatic’.
+
+     Attribute ‘"out.attrs"’ is a list which gives the dimension and
+     dimnames for use by ‘predict’ methods.
+
+_N_o_t_e:
+
+     Conversion to a factor is done with levels in the order they occur
+     in the character vectors (and not alphabetically, as is most
+     common when converting to factors).
+
+_R_e_f_e_r_e_n_c_e_s:
+
+     Chambers, J. M. and Hastie, T. J. (1992) _Statistical Models in
+     S._ Wadsworth & Brooks/Cole.
+
+_S_e_e _A_l_s_o:
+
+     ‘combn’ (package ‘utils’) for the generation of all combinations
+     of n elements, taken m at a time.
+
+_E_x_a_m_p_l_e_s:
+
+     require(utils)
+     
+     expand.grid(height = seq(60, 80, 5), weight = seq(100, 300, 50),
+                 sex = c("Male","Female"))
+     
+     x <- seq(0, 10, length.out = 100)
+     y <- seq(-1, 1, length.out = 20)
+     d1 <- expand.grid(x = x, y = y)
+     d2 <- expand.grid(x = x, y = y, KEEP.OUT.ATTRS = FALSE)
+     object.size(d1) - object.size(d2)
+     ##-> 5992 or 8832 (on 32- / 64-bit platform)
+     
+
