@@ -133,8 +133,6 @@ Even if the vital rates show strong spatial structure, if those vital rates tend
 
 One of the most important measures of individual demographic performance is reproductive output over time. To measure this we calculate $R_{j0}^J$, the number of fruiting bodies an individual is expected to produce between years $j0$ and $J$. We assume $R_{j0}^J$ is proportional to the number of seeds produced by an individual. $R_{j0}^J$ is similar to a cohort specific $R_0$, but since survival and growth in particular are strongly influenced by time since fire we do not extrapolate reproductive performance outside the observation period of the data. We put the models Eq. \ref{eq:site_bin}, \ref{eq:height} and \ref{eq:seed_pro} into an integral projection modelling framework to calculate per-individual seed productivity over the study period ($R_{j0}^J$). Because we calculate $R_{j0}^J$ at an individual level (as opposed to the population level measure $R_0$), distributions over size are interpreted as uncertainty around the size of an individual, rather than variation in size within a population.    
 
-We start by defining the frequency distribution of height $z$ of individual $i$ in year $j$, at location $q_i$ as $n(z, j, q_i)$. This means that in the first year $n(z, j, q_i)$ is a probability density that should integrate to 1 since we know an individual has to have some size. In 2001 there was a fire at the site that killed all individuals. Thus, we assume that all individuals in 2002 were less than one year old. We use a log-normal distribution fit to the observed 2002 size distribution as the initial size distribution $n(z, j, q_i)$.   
-
 In order to propagate uncertainty in growth through time we need to integrate over size and incorporate size and year dependent survival, so that
 \begin{equation}\label{eq:growth_sim}
 	n(Z, j + 1, q_i) = \int_Z n(z, j, q_i)S(z, j, q_i)K(z, j, q_i)\text{d}z 
@@ -187,148 +185,17 @@ where $y_j^r$, $\beta_h^r$ and $G_r(q_i)$ are estimated in Eq's \ref{eq:site_bin
 \end{equation}      
 \end{subequations}
 where $\beta_0^{f*}$ is the intercept for site $g^*$ where the vital rates were mapped and measured, $\beta_h^f$ is the effect of height on fruit number and $\sigma_f$ is the standard deviation of the underlying exponentiated normal distribution estimated in Eq. \ref{eq:seed_pro}. 
- our uncertainty around $R_0$.        
+ 
+For each knot location $q_i$ we We estimate total fruit production for the cohort starting in 2002 until 2007 ($R_{02}^{07}$). There was a major fire at the site in 2001 killing most individuals. By starting our observation period in 2002 we capture the effect of important post fire changes in demography. We start by defining the frequency distribution of height $z$ of individual $i$ in year $j$, at location $q_i$ as $n(z, j, q_i)$. This means that in the first year $n(z, j, q_i)$ is a probability density that should integrate to 1 since we know an individual has to have some size. In 2001 there was a fire at the site that killed all individuals. Thus, we assume that all individuals in 2002 were less than one year old. We use a log-normal distribution fit to the observed 2002 size distribution as the initial size distribution $n(z, j, q_i)$. We then simulate $n(z, j, q_i)$ through time using Eq. \ref{eq:growth_sim} and calculate Eq. \ref{eq:R0}.    
 
-
-
-
-
-
-
-
-
-
-
-One aspect of life history we are interested in is how long an individual can be expected to live given they start life in initial year $j_0$. The probability that an individual we start tracking in year $j_0$, location $q_i$, will survive until year $j$ is
-\begin{equation}\label{eq:sur_j}
-	\text{Pr}(S|j, j_0, q_i) = \int_Z n(z, j, q_i)\text{d}z
-\end{equation}
-We calculate $n(Z, j, q_i)$ in each year by choosing location $q_i$ and year $j_0$ to start tracking an individual, then we recursively calculate Eq. \ref{eq:growth_sim}. We define the life expectancy of an individual as their age in the first year in which there is a less than 5\% chance that the individual is still alive, thus, 
-\begin{equation}
-	L_E = j - j_0~\text{such that}~\text{Pr}(S|j, j_0, q_i) \leq 0.05 
-\end{equation} 
-To incorporate the uncertainty in estimated growth rate and survival we repeatedly draw an instance of parameter set $\theta = \{y_j^s, \beta_h^s, y_j^k, \beta_j, \sigma_k, G_k(q_i), G_s(q_i) \}$ from the posterior distributions of these parameters obtained from their fitting. A value of $L_E$ is calculated for each draw of $\theta$ to build a distribution of $L_E$ that reflects both the uncertainty around growth rate, and uncertainty in parameter estimation.
-
-Age of fist reproduction incorporates probability of flowering into Eq. \ref{eq:sur_j}. The probability that an individual that we begin tracking in year $j_0$ flowers in year $j$ depends on the growth of that individual and the uncertainty in that growth. Thus, the probability of flowering at least once before year $j^*$, after starting life in year $j_0$ is
-\begin{equation}
-	\text{Pr}(R| j^*, j_0, q_i) = 1 - \prod_{j = j_0}^{j^*} (1 - \text{Pr}(R|j, q_i)) 	
-\end{equation}              
-We define the age of first reproduction ($R_a$) as the age by which there is a 95\% chance an individual will have flowered,    
-\begin{equation}
-	R_a = j^* - j_0,~\text{where}~j^*~\text{is the smallest value such that}~\text{Pr}(R| j^*, j_0, q_i) \geq 0.95
-\end{equation}
-The probability that an individual in location $q_i$ will flower in year $j$ is 
-\begin{equation}\label{eq:prob_rep}
-	\text{Pr}(R|j, q_i) = \int_Z \frac{n(z, j, q_i)R(z, j, q_i)\text{d}z}{\text{Pr}(S|j, j_0, q_i)}
-\end{equation}
-where the probability of survival until year $j$, location $q_i$ ($\text{Pr}(S|j, j_0, q_i)$, Eq. \ref{eq:sur_j}) acts as a normalizing constant so that the distribution $n(Z, j, q_i)$ integrates to 1 and can be treated as a probability density. We obtain $n(Z, j, q_i)$ by starting with an individual in year $j_0$, location $q_i$ and recursively calculating Eq. \ref{eq:growth_sim}. The probability that an individual of size $z$ will flower in year $j$, location $q_i$ is adapted from Eq. \ref{eq:site_bin} to be       
-\begin{subequations}
-\label{eq:prob_flower}
-\begin{equation}
-	R(z, j, q_i) = \frac{1}{1 + \text{exp}(-\eta_r(z, j, q_i))}
-\end{equation}
-\begin{equation}
-	\eta_r(z, j, q_i) = y_j^r + \beta_h^r z + G_r(q_i)
-\end{equation}
-\end{subequations}
-where $y_j^r$, $\beta_h^r$ and $G_r(q_i)$ are estimated in Eq's \ref{eq:site_bin} and \ref{eq:spp_lp}, when the model Eq. \ref{eq:site_bin} is fit to reproduction data. Parameter uncertainty in estimated age of fist reproduction is incorporated by drawing samples from the posterior distributions of parameters $\theta = \{y_j^s, \beta_h^s, y_j^k, \beta_j, \sigma_k, G_k(q_i), G_s(q_i), y_j^r, \beta_h^r, G_r(q_i) \}$, recalculating $R_a$ for each draw to build a distribution of $R_a$. Note that parameter set $\theta$ includes parameters for growth, survival and probability of flowering, since all these vital rates contribute to $R_a$.
-
-The expected number of reproductive events for an individual over the period $j_0$ to $J$ is
-\begin{equation}\label{eq:Rn}
-	R_n = \text{Pr}(R|j_0, q_i) + \sum_{j = j_0 + 1}^{j = J} \text{Pr}(S|j, j_0, q_i)\text{Pr}(R|j, q_i)
-\end{equation}    
-The final year we have observations for is 2007, thus we set $J = 2007$. $\text{Pr}(R|j, q_i)$ is defined in Eq. \ref{eq:prob_rep}. Recall that $\text{Pr}(R|j, q_i)$ uses $\text{Pr}(S|j, j_0, q_i)$ (Eq. \ref{eq:sur_j}) as a normalizing constant, thus Eq \ref{eq:Rn} can be written more simply as 
-\begin{equation}\label{eq:Rn_simp}
-	R_n = \sum_{j = j_0}^{j = J} \int_Z n(z, j, q_i)R(z, j, q_i)\text{d}z
-\end{equation}
-We used the same posterior sampling process to build a distribution of $R_n$ as outlined in Eq. \ref{eq:prob_flower}.
-
-Finally we included the estimated number of seeds produced by an individual of height $z$ into Eq. \ref{eq:Rn_simp} to get the expected number of seeds produced over time period $j_0$ to $J$
-\begin{equation}\label{eq:R0}
-	R_0 = \sum_{j = j_0}^{j = J} \int_Z n(z, j, q_i)R(z, j, q_i)f(z)\text{d}z
-\end{equation}
-where $f(z)$ is adapted from Eq. \ref{eq:seed_pro}
-\begin{subequations}
-\begin{equation}
-	f(z) \sim \text{exp}[N(\mu_f(z), \sigma_f)] - 1
-\end{equation}
-\begin{equation}
-	\mu_f(z) = \beta_0^f + \beta_h^f z + \delta_{g^*}^f
-\end{equation}      
-\end{subequations}
-Where $\delta_{g^*}^f$ is the random intercept for site $g^*$ where the vital rates were mapped and measured.$\beta_0^f$, $\beta_h^f$,  $\delta_{g^*}^f$ and $\sigma_f$ are estimated in Eq. \ref{eq:seed_pro}. Note that $f(z)$ is a distribution, and so the integration in Eq. \ref{eq:R0} adds these distributions together across all values for $z$, propagating our uncertainty in $f(z)$ to our uncertainty around $R_0$.        
-
-
-ALTERNATE STRATEGY
-Even if the vital rates show strong spatial structure, if those vital rates tend to show negative co-variance with each other integrated measures of demographic performance may show much less spatial structure. Alternately vital rates might show positive covariance (i.e. and location that is good for growth is also good for survival and reproduction) then variation in integrated measures of demographic performance may be even more strongly spatially structured than the underlying rates. 
-
-One of the most important measures of individual demographic performance is reproductive output over time. To measure this we calculate $R_{j0}^J$, the number of fruiting bodies an individual is expected to produce between years $j0$ and $J$. We assume $R_{j0}^J$ is proportional to the number of seeds produced by an individual. $R_{j0}^J$ is similar to a cohort specific $R_0$, but since survival and growth in particular are strongly influenced by time since fire we do not want to extrapolate reproductive performance outside the observation period of the data. Also, because we calculate $R_{j0}^J$ at an individual level (as opposed to the population level measure $R_0$), distributions over size are interpreted as uncertainty around the size of an individual, rather than variation in size within a population.    
-
-$R_{j0}^J$ incorporates size, survival and probability of flowering, since fruit production is conditional on all three processes. We begin by calculating fruit production in the first year $j0$. We assume individual $i$ is alive in year $j0$ and that we are certain about its height. Thus, fruit production in the first year is 
-\begin{equation}
-	R(z_0, j0, q_i)f(z_0)
-\end{equation}   
-where the probability of flowering given height $z$, year $j$ and location $q_i$ is 
-\begin{subequations}
-\label{eq:prob_flower}
-\begin{equation}
-	R(z, j, q_i) = \frac{1}{1 + \text{exp}(-\eta_r(z, j, q_i))}
-\end{equation}
-\begin{equation}
-	\eta_r(z, j, q_i) = y_j^r + \beta_h^r z + G_r(q_i)
-\end{equation}
-\end{subequations}
-where $y_j^r$, $\beta_h^r$ and $G_r(q_i)$ are estimated in Eq's \ref{eq:site_bin} and \ref{eq:spp_lp}, when the model Eq. \ref{eq:site_bin} is fit to reproduction data. Number of fruits per plant of height $z$ is
-\begin{subequations}
-\begin{equation}
-	f(z) \sim lnN(\mu_f, \sigma_f)
-\end{equation}
-\begin{equation}
-	\mu_f(z) = \beta_0^{f*}`` + \beta_h^f h_i
-\end{equation}      
-\end{subequations}
-where $\beta_0^{f*}$ is the intercept for site $g^*$ where the vital rates were mapped and measured, $\beta_h^f$ is the effect of height on fruit number and and $\sigma_f$ is the variance of the underlying exponentiated normal distribution estimated in Eq. \ref{eq:seed_pro}. 
-
-To get the fruit production in subsequent years survival and growth need to be incorporated, so that 
-\begin{equation}
-	R_{j0}^J = R(z_0, j0, q_i)f(z_0) + \sum_{j = j0 + 1}^J K(z', j, q_i)S(z, j, q_i)R(z, j, q_i)f(z) 
-\end{equation} 
-where the growth kernel $K(z', j, q_i)$ gives the height on an individual in year $j$ given its location $q_i$ and previous height $z'$. $K(z, j, q_i)$ is adapted from Eq. \ref{eq:height}, and is 
-\begin{subequations}
-\label{eq:growth}
-\begin{equation}
-	K(z, j, q_i) \sim N(\mu_k(z, j, q_i), \sigma_k)
-\end{equation}
-\begin{equation}
-	\mu_k(z, j, q_i) = y_j^k + \beta_j^k z + G_k(q_i)
-\end{equation}
-\end{subequations}
-where $y_j^k$, $\beta_j$, $\sigma_k$ and $G_k(q_i)$ are estimated by fitting Eq. \ref{eq:height}, to height data. The probability that an individual at location $q_i$ with height $z$ in year $j$ survives is     
-\begin{subequations}
-\label{eq:survival}
-\begin{equation}
-	S(z, j, q_i) = \frac{1}{1 + \text{exp}(-\eta_s(z, j, q_i))}
-\end{equation}
-\begin{equation}
-	\eta_s(z, j, q_i) = y_j^s + \beta_h^s z + G_s(q_i)
-\end{equation}
-\end{subequations}
-where $y_j^s$, $\beta_h^s$ and $G_s(q_i)$ are estimated in Eq's \ref{eq:site_bin} and \ref{eq:spp_lp}, when the model Eq. \ref{eq:site_bin} is fit to survival data. 
-
-There are multiple levels of uncertainty in our estimation of $R_{j0}^J$. Both $f(z)$  and $K(z', j, q_i)$ are randomly distributed variables, where the distribution represents our uncertainty over how growth and survival respond to height, year and location. There is also uncertainty around the fitted parameter values used to estimate $R(z, j, q_i)$, $S(z, j q_i)$, $f(z)$ and $K(z, j, q_i)$. 
-
-In order to propagate both types of uncertainty into $R_{j0}^J$ we use a simulation process. We estimate total fruit production for the cohort starting in 2002 until 2007 ($R_{02}^{07}$). There was a major fire at the site in 2001 killing most individuals. By starting our observation period in 2002 we capture the effect of important post fire changes in demography. To include uncertainty in parameter estimates we draw a parameter set 
+There is uncertainty in our parameter estimates. In order to propagate this uncertainty into $R_{j0}^J$ we use a simulation process. We estimate total fruit production for the cohort starting in 2002 until 2007 ($R_{02}^{07}$). There was a major fire at the site in 2001 killing most individuals. By starting our observation period in 2002 we capture the effect of important post fire changes in demography. To include uncertainty in parameter estimates we draw a parameter set 
 \begin{equation}
 	\theta = \{ y_j^s, \beta_h^s, G_s(q_i), y_j^k, \beta_j^k, \sigma_k, G_k(q_i),  y_j^r, \beta_h^r, G_r(q_i), \beta_0^f, \beta_h^f \}
 \end{equation}  
-from the posterior distribution of each parameter. For each individual in 2002 we know their height and the year, giving us $z_0$ and $j0$. Then to simulate the fate of that individual through time and determine the number of fruit it produces we calculate $R_{j0}^J | \theta$ by drawing random variates from the distributions $f(z)$ (lognormal), $Bernoulli(R(z, j, q_i))$, $Bernoulli(S(z, j, q_i))$, and $K(z', j, q_i)$ (normal distribution) under parameter set $\theta$. Note that aside from the first year $z'$ will be a randomly drawn height from the previous year. We repeat this process ?1000 times, drawing a new parameter set $\theta$ every time. Thus, $R_{j0}^J$ for each location will be a distribution that incorporates our uncertainty in growth rate, fruit production and parameter uncertainty.                        
+from the posterior distribution of each parameter.                        
 
 \subsection*{Testing for spatial structure in measures of individual performance and life history strategy}
-We are interested in whether or not $R_{j0}^J$, which integrates different vital rates, show a similar spatial structure to the vital rates themselves. Complicating this task is that $R_{j0}^J$ is a distribution that represents our uncertainty in both vital rates and the parameters used to estimate those vital rates. The simplest way to approach this is to simply ignore that uncertainty and only use the modes of those distributions. An alternative is to compare the distributions of demographic measures built using the spatially structured models to those built in the same way, but with the non-spatial site level models, where the spatial term $G(q_i)$ is dropped from all vital rate models. We can then compare the cumulative density function of each of these distributions to see how far the spatial distribution lies to the left or right of the non-spatial model so that 
-\begin{equation}
-	\Delta M = \int_m M \text{d}m - \int_m M' \text{d}m
-\end{equation}              
-Where $\Delta M$ is the difference between the CDF of spatial demographic measure ($M$) and the non-spatial demographic measure ($M'$). 
+We are interested in whether or not $R_{j0}^J$, which integrates different vital rates, show a similar spatial structure to the vital rates themselves. talk about randomization we did.
 
 \section*{Results}
 Year (and by proxy time since fire) effected both survival and growth. Following a fire in 2001 survival decreased until 2006, while the intercept for 2006 and 2007 are the same ($y_j$ in Figure \ref{fig:effect_size}, survival). Growth showed a similar pattern, with growth rate ($\beta_j$) for 2003 (and to a lesser extent 2004) being much higher than estimated growth rate in subsequent years (gr\_j in Figure \ref{fig:effect_size}, growth). [ASIDE: these effects look a lot like Bethan's time since fire splines for a different species in same region/system]. Year had much less effect on reproduction, with no large differences in intercept for probability of flowering between years ($y_j$ in Figure \ref{fig:effect_size}, reproduction).     
